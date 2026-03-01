@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zyn — AI That Actually Gets It</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080808;
+    --acc: #ff5500;
+    --acc2: #e8341a;
+    --text: #ededed;
+    --muted: #555;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.4;
+  }
+
+  /* ── GRADIENT BLOBS ── */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,85,0,0.35) 0%, transparent 70%);
+    top: -200px; left: -200px;
+    animation: blobmove1 8s ease-in-out infinite alternate;
+  }
+  .blob-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(232,52,26,0.2) 0%, transparent 70%);
+    bottom: -150px; right: -100px;
+    animation: blobmove2 10s ease-in-out infinite alternate;
+  }
+  .blob-3 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,120,0,0.15) 0%, transparent 70%);
+    top: 50%; left: 60%;
+    animation: blobmove3 12s ease-in-out infinite alternate;
+  }
+
+  @keyframes blobmove1 { to { transform: translate(60px, 80px) scale(1.1); } }
+  @keyframes blobmove2 { to { transform: translate(-40px, -60px) scale(0.9); } }
+  @keyframes blobmove3 { to { transform: translate(30px, -50px) scale(1.2); } }
+
+  /* ── GRID LINES ── */
+  .grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,85,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,85,0,0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── MAIN ── */
+  main {
+    position: relative;
+    z-index: 10;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+  }
+
+  /* ── TOP BAR ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 20;
+    animation: fadedown 1s ease forwards;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--acc);
+    box-shadow: 0 0 10px var(--acc);
+    animation: pulse 2s ease infinite;
+  }
+  .nav-tag {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,85,0,0.08);
+    border: 1px solid rgba(255,85,0,0.25);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: #ff8844;
+    margin-bottom: 28px;
+    animation: fadein 1s ease 0.2s both;
+  }
+  .badge-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--acc);
+    animation: pulse 1.5s ease infinite;
+  }
+
+  /* ── HERO TITLE ── */
+  h1 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: clamp(52px, 10vw, 110px);
+    line-height: 0.95;
+    letter-spacing: -3px;
+    color: var(--text);
+    margin-bottom: 24px;
+    animation: fadein 1s ease 0.4s both;
+  }
+
+  h1 .accent {
+    background: linear-gradient(135deg, var(--acc), #ffaa00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  h1 .outline {
+    -webkit-text-stroke: 2px rgba(255,255,255,0.15);
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* ── SUBTITLE ── */
+  p.sub {
+    font-size: clamp(15px, 2vw, 18px);
+    color: var(--muted);
+    max-width: 480px;
+    line-height: 1.7;
+    margin-bottom: 44px;
+    font-weight: 300;
+    animation: fadein 1s ease 0.6s both;
+  }
+
+  /* ── CTA BUTTON ── */
+  .cta-wrap {
+    animation: fadein 1s ease 0.8s both;
+    position: relative;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, var(--acc), var(--acc2));
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 16px 40px;
+    border-radius: 100px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 0 40px rgba(255,85,0,0.4), 0 0 80px rgba(255,85,0,0.15);
+  }
+
+  .cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .cta:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 60px rgba(255,85,0,0.6), 0 0 120px rgba(255,85,0,0.2);
+  }
+  .cta:hover::before { opacity: 1; }
+  .cta:active { transform: scale(0.98); }
+
+  .cta-arrow {
+    width: 20px; height: 20px;
+    transition: transform 0.2s ease;
+  }
+  .cta:hover .cta-arrow { transform: translateX(4px); }
+
+  /* glow ring behind button */
+  .cta-glow {
+    position: absolute;
+    inset: -20px;
+    border-radius: 100px;
+    background: radial-gradient(ellipse, rgba(255,85,0,0.2) 0%, transparent 70%);
+    pointer-events: none;
+    animation: glowpulse 3s ease infinite;
+  }
+
+  /* ── FLOATING CHIPS ── */
+  .chips {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    animation: fadein 1.5s ease 1.2s both;
+  }
+
+  .chip {
+    position: absolute;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #444;
+    white-space: nowrap;
+    animation: float linear infinite;
+  }
+
+  /* ── BOTTOM INFO ── */
+  .bottom {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 12px;
+    color: #333;
+    z-index: 20;
+    animation: fadein 1s ease 1.2s both;
+    white-space: nowrap;
+  }
+  .bottom-dot { width: 3px; height: 3px; border-radius: 50%; background: #333; }
+
+  /* ── SCROLL INDICATOR ── */
+  .scroll-hint {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 20;
+    animation: fadein 1s ease 1.5s both;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(255,85,0,0.6), transparent);
+    animation: scrollline 2s ease infinite;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadein { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadedown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  @keyframes glowpulse { 0%,100%{opacity:0.5;transform:scale(1);} 50%{opacity:1;transform:scale(1.1);} }
+  @keyframes scrollline { 0%{opacity:0;transform:scaleY(0);transform-origin:top;} 50%{opacity:1;transform:scaleY(1);} 100%{opacity:0;transform:scaleY(1);} }
+  @keyframes float {
+    0% { transform: translateY(0px) translateX(0px); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-80px) translateX(20px); opacity: 0; }
+  }
+
+  /* ── CURSOR GLOW ── */
+  #cursor-glow {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,85,0,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    transition: left 0.1s ease, top 0.1s ease;
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div class="grid"></div>
+<div id="cursor-glow"></div>
+
+<!-- floating chips -->
+<div class="chips" id="chips"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    Zyncc
+    <div class="nav-dot"></div>
+  </a>
+  <span class="nav-tag">zyn.ai</span>
+</nav>
+
+<!-- HERO -->
+<main>
+  <div class="badge">
+    <div class="badge-dot"></div>
+    Now live — try it free
+  </div>
+
+  <h1>
+    <span class="outline">Think</span><br>
+    <span class="accent">Smarter.</span><br>
+    <span style="font-size:0.65em;letter-spacing:-1px;color:rgba(255,255,255,0.5);font-weight:300">with Zyn</span>
+  </h1>
+
+  <p class="sub">
+    The AI that actually gets it. Ask anything, build anything, learn anything — no fluff, just results.
+  </p>
+
+  <div class="cta-wrap">
+    <div class="cta-glow"></div>
+    <a class="cta" href="https://aistudio.google.com/apps/59b1b11d-df8a-436c-96f5-9f643be14b60?showAssistant=true&showPreview=true&fullscreenApplet=true" target="_blank">
+      Get Started
+      <svg class="cta-arrow" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+</main>
+
+<!-- BOTTOM -->
+<div class="bottom">
+  <span>Free to use</span>
+  <div class="bottom-dot"></div>
+  <span>No sign-up required</span>
+  <div class="bottom-dot"></div>
+  <span>© Zyn 2026</span>
+</div>
+
+<script>
+  // cursor glow
+  const glow = document.getElementById('cursor-glow');
+  document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+  });
+
+  // floating chips
+  const labels = ['💬 Chat AI','🧠 Deep Think','💻 Code Help','✍️ Write','🔍 Research','📊 Analyze','🌍 Translate','🐛 Debug','📚 Learn','⚡ Fiber Mode','🎯 Focused','🔥 Fast'];
+  const container = document.getElementById('chips');
+
+  function spawnChip() {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = labels[Math.floor(Math.random() * labels.length)];
+    const x = Math.random() * (window.innerWidth - 150);
+    const y = Math.random() * window.innerHeight;
+    const dur = 6 + Math.random() * 8;
+    chip.style.cssText = `left:${x}px;top:${y}px;animation-duration:${dur}s;animation-delay:${Math.random()*4}s`;
+    container.appendChild(chip);
+    setTimeout(() => chip.remove(), (dur + 4) * 1000);
+  }
+
+  for (let i = 0; i < 12; i++) spawnChip();
+  setInterval(spawnChip, 2000);
+</script>
+</body>
+</html>
